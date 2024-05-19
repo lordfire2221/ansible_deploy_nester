@@ -1,0 +1,41 @@
+logging {
+  debug: off
+  to_syslog: yes
+}
+nodelist {
+  node {
+    name: nginx1
+    nodeid: 1
+    quorum_votes: 1
+    ring0_addr: 192.168.20.7
+  }
+  node {
+    name: nginx2
+    nodeid: 2
+    quorum_votes: 1
+    ring0_addr: 192.168.20.8
+  }
+ node {
+    name: nginx3
+    nodeid: 3
+    quorum_votes: 1
+    ring0_addr: 192.168.20.9
+  }
+
+}
+quorum {
+  provider: corosync_votequorum
+}
+totem {
+  cluster_name: nginx_cluster
+  config_version: 3
+  ip_version: ipv4
+  secauth: on
+  version: 2
+  interface {
+    bindnetaddr: 192.168.20.0
+    ringnumber: 0
+    broadcast: yes
+    mcastport: 5405
+  }
+}

@@ -1,0 +1,52 @@
+- hosts: nginx 
+  become: true 
+  vars_files: 
+   - ./vars/secret.yml
+  tasks: 
+  - name: envoie du fichier de configuration sur l'ensemble des noeuds
+    copy: 
+     src: ./app/corosync.conf.j2
+     dest: /etc/corosync/corosync.conf
+
+  - name: redémarrage du service corosync 
+    service: 
+     name: corosync 
+     state: restarted
+     enabled: yes
+
+  - name: redémarrage du service pacemaker 
+    service: 
+     name: pacemaker 
+     state: restarted
+     enabled: yes   
+
+- hosts: nginx1
+  become: true 
+  vars_files: 
+   - ./vars/secret.yml
+  tasks: 
+  - name: commande shell 
+    shell: |
+     sudo pcs cluster setup nginx_cluster 192.168.20.7  192.168.20.8  192.168.20.9
+     sudo pcs cluster start --all
+     sudo pcs property set stonith-enabled=false
+     sudo pcs property set no-quorum-policy=ignore
+
+- hosts: nginx1 
+  become: true 
+  vars_files: 
+   - ./vars/secret.yml
+  tasks:
+  - name: shell de configuration 
+    shell: |
+     sudo pcs resource create nginx_service systemd:nginx op monitor interval=30s
+     sudo pcs resource create virtual_ip ocf:heartbeat:IPaddr2 ip=192.168.20.30 cidr_netmask=24 op monitor interval=20s
+     sudo pcs constraint colocation add nginx_service with virtual_ip INFINITY
+     sudo pcs constraint order virtual_ip then nginx_service
+
+
+
+
+
+
+ 

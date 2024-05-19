@@ -1,0 +1,45 @@
+- hosts: nginx
+  become: true
+  vars_files: 
+   - ./vars/secret.yml
+  tasks:
+
+  - name: installation de nginx et autre paquêt utile
+    apt:
+     name: ['nginx','wget','corosync','pacemaker','pcs']
+     state: present
+     update_cache: yes   
+
+  - name: modification du fichier default 
+    command: sudo mv /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default.save   
+    register: resultat
+
+  - name: réponse de la commande
+    debug: 
+     msg: "{{resultat}}"  
+
+  - name: copy du dossier de configuration pour le mspr
+    copy:
+     src: ./app/nginx/mspr.j2
+     dest: /etc/nginx/sites-enabled/mspr
+
+  - name : creation du répertoire mspr 
+    command: mkdir /var/www/mspr
+    register: resultat
+
+  - name: réponse de la création du répertoire
+    debug:
+     msg: "{{resultat}}"    
+
+  - name: copie du répertoire du projet du nester
+     copy:
+     src: ./app/mspr
+     dest: /var/www/mspr
+
+  - name: écriture des blocks des hosts 
+    blockinfile:
+      path: /etc/hosts
+      block: |
+        192.168.20.7 nginx1
+        192.168.20.8 nginx2
+        192.168.20.9 nginx3   
