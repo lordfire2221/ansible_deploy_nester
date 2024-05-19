@@ -23,7 +23,7 @@
      src: ./app/nginx/mspr.j2
      dest: /etc/nginx/sites-enabled/mspr
 
-  - name : creation du répertoire mspr 
+  - name: creation du répertoire mspr 
     command: mkdir /var/www/mspr
     register: resultat
 
@@ -32,7 +32,7 @@
      msg: "{{resultat}}"    
 
   - name: copie du répertoire du projet du nester
-     copy:
+    copy:
      src: ./app/final_mspr
      dest: /var/www/mspr
 
