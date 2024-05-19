@@ -33,7 +33,7 @@
 
   - name: copie du répertoire du projet du nester
      copy:
-     src: ./app/mspr
+     src: ./app/final_mspr
      dest: /var/www/mspr
 
   - name: écriture des blocks des hosts 
