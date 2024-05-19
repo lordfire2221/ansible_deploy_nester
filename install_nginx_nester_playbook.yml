@@ -36,6 +36,12 @@
      src: ./app/final_mspr
      dest: /var/www/mspr
 
+  - name: restart du service nginx
+    service:
+      name: nginx 
+      state: restarted
+      enabled: yes 
+
   - name: écriture des blocks des hosts 
     blockinfile:
       path: /etc/hosts
@@ -43,3 +49,18 @@
         192.168.20.7 nginx1
         192.168.20.8 nginx2
         192.168.20.9 nginx3   
+
+- hosts: nginx1
+  become: true 
+  vars_files: 
+   - ./vars/secret.yml
+  tasks:
+
+  - name: générer le auth du corosync 
+    command: corosync-keygen
+    register: resultat
+
+  - name: réponse
+    debug: 
+      msg: "{{resultat}}"   
+     
